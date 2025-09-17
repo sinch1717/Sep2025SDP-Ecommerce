@@ -1,7 +1,7 @@
 package com.nie.csd.services;
 
 import java.util.List;
-import java.util.Optional;
+// import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,18 +31,21 @@ public class ProductService {
         return repository.findById(id)
         .orElseThrow( () -> {
             logger.error("Product with id: "+id+" not found in the database of collections products");
+            logger.info("Error logged");
             return new IdNotPresentException("Product not found id: "+id);
          }
         );
     }
 
     public Products addProducts(Products products) {
+        logger.info("Adding new product to the database of collection products");
         return repository.save(products);
     }
 
     public Products updateProducts(String id, Products product) {
         Products existingProduct = repository.findById(id).get();
         if (existingProduct != null) {
+            logger.info("Product with id "+id+"updated in collection products");
             existingProduct.setName(product.getName());
             existingProduct.setDescription(product.getDescription());
             existingProduct.setCategory(product.getCategory());
@@ -51,6 +54,7 @@ public class ProductService {
             existingProduct.setStock(product.getStock());
             return repository.save(existingProduct);
         }
+        logger.info("Product with id "+id+"not found, saved as new product in collection products");
         return repository.save(product);
         // if the product exists, update it; otherwise, add a new product
         // the id is not being updated here
@@ -59,10 +63,12 @@ public class ProductService {
     public void deleteProducts(String id) {
         Products existingProduct = repository.findById(id).get();
         if (existingProduct != null){
+            logger.info("Product with id "+id+"deleted successfully from collection products");
             repository.deleteById(id);
             System.out.println("Product deleted succesfully");
         }
         else{
+            logger.info("Product with id "+id+"not found");
             System.out.println("Product with id " + id + " not found");
         } 
     }
