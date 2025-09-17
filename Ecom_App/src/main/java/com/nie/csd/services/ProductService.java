@@ -1,6 +1,11 @@
 package com.nie.csd.services;
 
 import java.util.List;
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+// import org.apache.commons.logging.LogFactory; // Removed unused import
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,16 +16,24 @@ import com.nie.csd.models.*;
 @Service
 public class ProductService {
 
+    Logger logger = LoggerFactory.getLogger(ProductService.class);
+
     @Autowired
     private ProductRepository repository;
 
     public List<Products> getAllProducts() {
+        logger.info("Retrieving all products from the database of collections products");
         return repository.findAll();
     }
 
     public Products getByProductId(String id) throws IdNotPresentException {
+        logger.debug("Retrieving product with id : {} from database "+"of collections products", id);
         return repository.findById(id)
-        .orElseThrow( () -> new IdNotPresentException("Product not found id: "+id)) ;
+        .orElseThrow( () -> {
+            logger.error("Product with id: "+id+" not found in the database of collections products");
+            return new IdNotPresentException("Product not found id: "+id);
+         }
+        );
     }
 
     public Products addProducts(Products products) {
