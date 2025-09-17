@@ -3,6 +3,7 @@ package com.nie.csd.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,39 +23,40 @@ public class ProductController {
     @Autowired
     private ProductService service;
 
-
-    
     // Return a list of products
     @GetMapping("/products")
     public ResponseEntity<List<Products>> getAllProducts() {
         List<Products> productList = service.getAllProducts();
-        return ResponseEntity.ok(productList);
+        return ResponseEntity.status(HttpStatus.OK).body(productList);
     }
 
     // get a product by id
     @GetMapping("/products/{id}")
     public ResponseEntity<Products> getByProductId(@PathVariable("id") String id) throws IdNotPresentException{
 	    Products product = service.getByProductId(id);
-        return ResponseEntity.ok(product);
+        return ResponseEntity.status(HttpStatus.OK).body(product);
      //.orElseThrow(() -> new RuntimeException("Product not found with id " + id));
     }
 
     // add a new product
     @PostMapping("/products")
     public Products addProducts(@RequestBody Products product) {
-        return service.addProducts(product);
+        Products newProduct = service.addProducts(product);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newProduct).getBody();
     }
 
     // update a product by id; else add a new product
     @PutMapping("/products/{id}")
     public Products updateProducts(@PathVariable("id") String id, @RequestBody Products product) {
         // Implementation for updating a product
-        return service.updateProducts(id, product); // Placeholder return statement
+        Products updatedProduct = service.updateProducts(id, product); // Placeholder return statement
+        return ResponseEntity.status(HttpStatus.OK).body(updatedProduct).getBody();
     }
 
     // delete a product by id
     @DeleteMapping("/products/{id}")
-    public void deleteProducts(@PathVariable("id") String id) {
+    public ResponseEntity<Void> deleteProducts(@PathVariable("id") String id) {
         service.deleteProducts(id); 
+        return ResponseEntity.noContent().build();
     }
 }
