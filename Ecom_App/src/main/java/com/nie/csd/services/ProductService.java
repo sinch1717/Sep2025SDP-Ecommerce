@@ -43,22 +43,24 @@ public class ProductService {
     }
 
     public Products updateProducts(String id, Products product) {
-        Products existingProduct = repository.findById(id).get();
-        if (existingProduct != null) {
-            logger.info("Product with id "+id+"updated in collection products");
-            existingProduct.setName(product.getName());
-            existingProduct.setDescription(product.getDescription());
-            existingProduct.setCategory(product.getCategory());
-            existingProduct.setTags(product.getTags());
-            existingProduct.setPrice(product.getPrice());
-            existingProduct.setStock(product.getStock());
-            return repository.save(existingProduct);
-        }
-        logger.info("Product with id "+id+"not found, saved as new product in collection products");
+    Products existingProduct = repository.findById(id).orElse(null);
+
+    if (existingProduct != null) {
+        logger.info("Product with id {} updated in collection products", id);
+        existingProduct.setName(product.getName());
+        existingProduct.setDescription(product.getDescription());
+        existingProduct.setCategory(product.getCategory());
+        existingProduct.setTags(product.getTags());
+        existingProduct.setPrice(product.getPrice());
+        existingProduct.setStock(product.getStock());
+        return repository.save(existingProduct);
+    } else {
+        logger.info("Product with id {} not found, saving as new product", id);
+        product.setId(id); // important if you want to save with the same id
         return repository.save(product);
-        // if the product exists, update it; otherwise, add a new product
-        // the id is not being updated here
+        }
     }
+
 
     public void deleteProducts(String id) {
         Products existingProduct = repository.findById(id).get();
